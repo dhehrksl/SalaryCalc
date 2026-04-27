@@ -74,6 +74,8 @@ export default function HomePage() {
           <p className="mt-2">
             <a href="/retirement" className="hover:text-brand">퇴직금 계산기</a>
             <span className="mx-2">·</span>
+            <a href="/annual-leave" className="hover:text-brand">연차/연차수당 계산기</a>
+            <span className="mx-2">·</span>
             <a href="/privacy" className="hover:text-brand">개인정보처리방침</a>
             <span className="mx-2">·</span>
             <span>© {new Date().getFullYear()} Salary Calc</span>

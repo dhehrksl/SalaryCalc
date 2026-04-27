@@ -99,6 +99,10 @@ export default function RetirementPage() {
               연봉 실수령액 계산기
             </Link>
             <span className="mx-2">·</span>
+            <Link href="/annual-leave" className="hover:text-brand">
+              연차/연차수당 계산기
+            </Link>
+            <span className="mx-2">·</span>
             <Link href="/privacy" className="hover:text-brand">
               개인정보처리방침
             </Link>
