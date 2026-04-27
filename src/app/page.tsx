@@ -72,6 +72,8 @@ export default function HomePage() {
             본 계산기는 2025~2026년 시행 기준 4대보험료율·소득세법을 바탕으로 한 추정치이며, 실제 원천징수액과는 ±3% 내외 차이가 있을 수 있습니다.
           </p>
           <p className="mt-2">
+            <a href="/retirement" className="hover:text-brand">퇴직금 계산기</a>
+            <span className="mx-2">·</span>
             <a href="/privacy" className="hover:text-brand">개인정보처리방침</a>
             <span className="mx-2">·</span>
             <span>© {new Date().getFullYear()} Salary Calc</span>

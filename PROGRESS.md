@@ -1,4 +1,4 @@
-# SalaryCalc — 진행 상황 (마지막 업데이트: 2026-04-27)
+# SalaryCalc — 진행 상황 (마지막 업데이트: 2026-04-28)
 
 > 다음 세션에서 Claude한테 이 파일 보여주거나 "Desktop/SalaryCalc/PROGRESS.md 읽고 이어가자"고 하면 그대로 컨텍스트 복원됨.
 
@@ -22,7 +22,11 @@
 - [x] 2026년 4대보험·근로소득세 계산 로직 (`src/lib/salary.ts`)
   - 국민연금 4.5% (상한 617만원), 건강보험 3.545%, 장기요양 12.95%, 고용보험 0.9%
   - 근로소득공제·인적공제·누진세율·근로소득세액공제(점진 감소)·자녀세액공제·식대 비과세
-- [x] vitest 17개 단위 테스트 모두 통과 (`npm test`)
+- [x] vitest 25개 단위 테스트 모두 통과 (`npm test`) — salary 17개 + retirement 8개
+- [x] **퇴직금 계산기 페이지** (`/retirement`) — 평균임금·재직일수 기반 법정 퇴직금 산정
+  - `src/lib/retirement.ts` — 평균임금 + 상여·연차수당 가산분 + 1년 미만 미지급 처리
+  - `src/components/RetirementCalculator.tsx` — 입사/퇴사일·임금·상여·연차수당 입력 UI
+  - 메인 페이지 footer에 링크 추가, sitemap 등록
 - [x] 메인 페이지 UI — `src/components/Calculator.tsx` (실시간 계산, 모드 토글, 프리셋)
 - [x] 보조 컴포넌트: `HowItWorks`, `RatesTable`, `Faq`, `StructuredData`
 - [x] `/privacy` 페이지 (AdSense 필수)
@@ -35,6 +39,10 @@
 ### 인프라
 - [x] GitHub 저장소 푸시 완료
 - [x] Vercel 자동 배포 (GitHub push → 자동 빌드)
+- [x] **Vercel Web Analytics 통합** (`@vercel/analytics`) — `layout.tsx`에 `<Analytics />` 마운트
+  - 설치 시 SvelteKit peerOptional 충돌로 `--legacy-peer-deps` 사용 (정상)
+  - Vercel 대시보드 → Analytics 탭에서 방문자수/페이지뷰/Top Pages 확인 가능
+  - **사용자 작업 필요**: Vercel 프로젝트 → Analytics 탭 → Enable 클릭 (1회, 무료)
 - [x] `SITE_URL` 자동 fallback 구현 (`src/lib/site.ts`)
   - 우선순위: `NEXT_PUBLIC_SITE_URL` → `VERCEL_PROJECT_PRODUCTION_URL` → placeholder
   - 환경변수 등록 안 해도 자동으로 올바른 URL이 메타·sitemap·robots에 박힘
@@ -49,7 +57,8 @@
 ## ⏳ 사용자 손이 필요한 즉시 작업
 
 - [ ] **`/privacy` 색인 요청** (1분) — Search Console → URL 검사 → `https://salary-calc-coral.vercel.app/privacy` 입력 → 색인 생성 요청
-- [ ] **Vercel Analytics 켜기** (5초) — Vercel 프로젝트 → Analytics 탭 → Enable 클릭
+- [ ] **`/retirement` 색인 요청** (1분) — 신규 추가, Search Console에서 URL 검사 → 색인 생성 요청
+- [ ] **Vercel Analytics 켜기** (5초) — Vercel 프로젝트 → Analytics 탭 → Enable 클릭. 코드는 이미 통합됨, 활성화만 하면 방문자수 집계 시작
 
 ---
 
@@ -74,8 +83,8 @@
 
 ### D. 콘텐츠 확장 (페이지 수 = SEO + AdSense 승인 가능성)
 콘텐츠 1개 추가 = 새 검색 키워드 1개 잡기. 우선순위:
-1. **퇴직금 계산기** (`/retirement`) — `퇴직금 계산` 월 30만 검색
-2. **연차/연차수당 계산기** (`/annual-leave`) — `연차수당 계산` 월 10만
+1. ~~**퇴직금 계산기** (`/retirement`)~~ ✅ 완료 (2026-04-28)
+2. **연차/연차수당 계산기** (`/annual-leave`) — `연차수당 계산` 월 10만 — **다음 추천**
 3. **시급/주급/월급 변환기** (`/hourly`)
 4. **연말정산 환급액 추정기** (`/year-end-tax`) — 12~2월 시즌 폭발
 5. **청약 가점 계산기** (`/apt-score`) — 부동산 키워드 (CPC 매우 높음)
@@ -122,22 +131,26 @@
 SalaryCalc/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx          # 메타데이터 + Search Console verification
+│   │   ├── layout.tsx          # 메타데이터 + Search Console verification + Vercel Analytics
 │   │   ├── page.tsx            # 메인 (광고 슬롯 7개 위치)
 │   │   ├── privacy/page.tsx
+│   │   ├── retirement/page.tsx # 퇴직금 계산기 페이지
 │   │   ├── sitemap.ts
 │   │   ├── robots.ts
 │   │   └── globals.css
 │   ├── components/
-│   │   ├── Calculator.tsx       # 입력 폼 + 결과 (use client)
-│   │   ├── AdSlot.tsx           # 광고 placeholder + SideAdSlot
+│   │   ├── Calculator.tsx          # 입력 폼 + 결과 (use client)
+│   │   ├── RetirementCalculator.tsx # 퇴직금 계산 UI
+│   │   ├── AdSlot.tsx              # 광고 placeholder + SideAdSlot
 │   │   ├── HowItWorks.tsx
 │   │   ├── RatesTable.tsx
 │   │   ├── Faq.tsx
 │   │   └── StructuredData.tsx
 │   └── lib/
-│       ├── salary.ts            # 핵심 계산 로직
+│       ├── salary.ts            # 연봉 실수령액 계산
 │       ├── salary.test.ts       # 17개 테스트
+│       ├── retirement.ts        # 퇴직금 계산
+│       ├── retirement.test.ts   # 8개 테스트
 │       └── site.ts              # SITE_URL fallback
 ├── README.md
 ├── NEXT_STEPS.md                # 깨어나서 할 일 체크리스트 (구버전)
@@ -173,4 +186,10 @@ git add . && git commit -m "..." && git push
 
 ---
 
-마지막 진행 시점 — 2026-04-27. 작업 컨텍스트는 이 파일에 그대로 남아 있음.
+마지막 진행 시점 — 2026-04-28. 작업 컨텍스트는 이 파일에 그대로 남아 있음.
+
+### 2026-04-28 추가 작업
+- Vercel Web Analytics 통합 (`@vercel/analytics` 1.x, layout에 마운트)
+- 퇴직금 계산기 페이지 (`/retirement`) — 평균임금 + 상여·연차수당 가산 + 1년 미만 미지급 처리, 8개 테스트 통과
+- sitemap에 `/retirement` 추가, 메인 footer에 링크 추가
+- 빌드 통과 (Static prerender, /retirement 3.83 kB)
