@@ -1,30 +1,43 @@
-# 연봉 실수령액 계산기 (SalaryCalc)
+# SalaryCalc — 한국 직장인 종합 계산기 모음
 
-2026년 시행 4대보험·근로소득세 기준 연봉 실수령액 계산기. **AdSense·SEO 친화 정적 사이트**로 만들어 검색 유입 → 광고 수익을 노리는 micro 프로젝트입니다.
+2026년 시행 4대보험·소득세·근로기준법 기준 **6개 계산기 통합 정적 사이트**.
+검색 유입 → 광고 수익을 노리는 micro 프로젝트입니다.
 
-스택: **Next.js 14 (App Router) + TypeScript + Tailwind + vitest**
+- **Live**: https://salary-calc-coral.vercel.app
+- **Repo**: https://github.com/dhehrksl/SalaryCalc
+- **스택**: Next.js 14 (App Router) + TypeScript + Tailwind + vitest + Vercel Analytics
+
+---
+
+## 운영 중인 계산기 6종
+
+| 경로 | 페이지 | 핵심 키워드 | 상태 |
+|-----|------|-----------|-----|
+| `/` | 연봉 실수령액 | `연봉 실수령액`, `월급 계산기` | ✅ |
+| `/retirement` | 퇴직금 | `퇴직금 계산`, `평균임금` | ✅ |
+| `/annual-leave` | 연차/연차수당 | `연차수당 계산`, `연차 발생` | ✅ |
+| `/hourly` | 시급/주급/월급 변환 | `시급 계산기`, `최저시급 2026` | ✅ |
+| `/year-end-tax` | 연말정산 환급 | `연말정산`, `13월의 월급` | ✅ |
+| `/apt-score` | 청약 가점 | `청약 가점`, `주택청약` | ✅ |
+
+전 페이지에 **CalculatorNav 공통 컴포넌트**가 삽입되어 어느 계산기에서든 1클릭으로 다른 계산기로 이동 가능.
 
 ---
 
 ## 빠른 시작
 
 ```bash
-npm install        # 최초 1회
+npm install        # 최초 1회 (peer 충돌 시 --legacy-peer-deps)
 npm run dev        # 개발 서버 (http://localhost:3000)
 npm run build      # 프로덕션 빌드
-npm start          # 빌드 결과 실행
-npm test           # 단위 테스트 (vitest)
+npm test           # 단위 테스트 80개 (vitest)
 ```
 
 ## 환경 변수
 
-배포 시 `.env.local` 또는 Vercel 환경변수에 다음 추가:
-
-```
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
-```
-
-이게 sitemap·robots·OG·canonical에 모두 사용됩니다. 미설정 시 placeholder URL이 들어가요.
+- `NEXT_PUBLIC_SITE_URL` — 커스텀 도메인 연결 후 갱신 (선택)
+- 미설정 시 `VERCEL_PROJECT_PRODUCTION_URL` 자동 fallback (Vercel이 빌드 시 주입)
+- 둘 다 없으면 placeholder. sitemap·robots·OG·canonical에 사용됨
 
 ---
 
@@ -33,132 +46,153 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 src/
 ├── app/
-│   ├── layout.tsx          # 루트 레이아웃 + 메타데이터
-│   ├── page.tsx            # 메인 계산기 페이지
-│   ├── privacy/page.tsx    # 개인정보처리방침 (AdSense 필수)
-│   ├── sitemap.ts          # /sitemap.xml 자동 생성
-│   ├── robots.ts           # /robots.txt 자동 생성
+│   ├── layout.tsx              # 메타 + Search Console verification + Vercel Analytics
+│   ├── page.tsx                # 메인 — 연봉 실수령액
+│   ├── retirement/page.tsx     # 퇴직금
+│   ├── annual-leave/page.tsx   # 연차/연차수당
+│   ├── hourly/page.tsx         # 시급/주급/월급
+│   ├── year-end-tax/page.tsx   # 연말정산 환급
+│   ├── apt-score/page.tsx      # 청약 가점
+│   ├── privacy/page.tsx        # 개인정보처리방침 (AdSense 필수)
+│   ├── sitemap.ts              # /sitemap.xml 자동 생성 (6페이지 + privacy)
+│   ├── robots.ts               # /robots.txt 자동 생성
 │   └── globals.css
 ├── components/
-│   ├── Calculator.tsx      # 입력 폼 + 결과 표시 (클라이언트)
-│   ├── HowItWorks.tsx      # 6단계 계산 방식 설명
-│   ├── RatesTable.tsx      # 4대보험율·세율표
-│   ├── Faq.tsx             # 8개 FAQ + 정의는 그대로 export
-│   └── StructuredData.tsx  # WebApplication·FAQPage JSON-LD
+│   ├── Calculator.tsx              # 연봉 실수령
+│   ├── RetirementCalculator.tsx    # 퇴직금
+│   ├── AnnualLeaveCalculator.tsx   # 연차/연차수당
+│   ├── HourlyCalculator.tsx        # 시급 변환
+│   ├── YearEndTaxCalculator.tsx    # 연말정산
+│   ├── AptScoreCalculator.tsx      # 청약 가점
+│   ├── CalculatorNav.tsx           # 6개 계산기 카드 네비 (모든 페이지 공통)
+│   ├── AdSlot.tsx                  # 광고 슬롯 placeholder
+│   ├── HowItWorks.tsx
+│   ├── RatesTable.tsx
+│   ├── Faq.tsx
+│   └── StructuredData.tsx
 └── lib/
-    ├── salary.ts           # 핵심 계산 로직
-    └── salary.test.ts      # 17개 단위 테스트 (vitest)
+    ├── salary.ts (+ test)        # 연봉 실수령액 — 17 tests
+    ├── retirement.ts (+ test)    # 퇴직금 — 8 tests
+    ├── annualLeave.ts (+ test)   # 연차 — 13 tests
+    ├── hourly.ts (+ test)        # 시급 환산 — 12 tests
+    ├── yearEndTax.ts (+ test)    # 연말정산 — 10 tests
+    ├── aptScore.ts (+ test)      # 청약 가점 — 20 tests
+    └── site.ts                   # SITE_URL fallback
 ```
+
+**총 80개 단위 테스트, 모두 통과.**
+
+---
+
+## 적용된 인프라
+
+- ✅ **Vercel 자동 배포** (`main` push → 자동 빌드)
+- ✅ **Vercel Web Analytics** (`@vercel/analytics/next`) — 방문자수·페이지뷰 추적
+- ✅ **Google Search Console** 등록 + 소유권 인증 완료
+  - verification token: `x66DRnGBmdW806wz2JSJemgr7sBQNNFE-wPVOslQCoU`
+- ✅ **Sitemap 제출** (`/sitemap.xml`)
+- ✅ **JSON-LD 구조화 데이터** (WebApplication + FAQPage)
+- ✅ **광고 슬롯 placeholder** — AdSense 승인 후 `<ins>` 코드 삽입 위치만 만들어둠
+- ✅ **6개 페이지 footer 상호 링크** — 내부 링크 그래프 = SEO 도움
+
+---
+
+## 다음 단계 체크리스트
+
+### A. 검색 노출 (지금 우선) ⏳
+
+- [x] 메인 페이지 색인 요청
+- [x] `/privacy` 색인 요청
+- [ ] **`/retirement` 색인 요청** ← 지금 진행
+- [ ] **`/annual-leave` 색인 요청**
+- [ ] **`/hourly` 색인 요청**
+- [ ] **`/year-end-tax` 색인 요청** (12~2월 검색량 폭발 키워드)
+- [ ] **`/apt-score` 색인 요청** (CPC 가장 높은 부동산 키워드)
+
+> Search Console → URL 검사 → 각 URL 입력 → "색인 생성 요청"
+> 색인까지 24시간~7일, 검색 노출은 1~3개월 소요
+
+### B. 트래픽 검증 (2~4주 후)
+
+색인 후 Search Console **"실적"** 탭에서 확인:
+- 노출수 (impression) — 검색 결과에 표시된 횟수
+- 클릭수 — 사용자가 실제 클릭한 횟수
+- 평균 게재순위 — 평균 검색 순위
+
+> 노출이 한 자릿수라도 잡히면 → 도메인 구입 단계로
+> 노출 0 → 콘텐츠 보강 또는 백링크 작업 필요
+
+### C. 도메인 구입 (트래픽 검증 후)
+
+- [ ] Porkbun에서 `.shop` 또는 `.xyz` 1,000~3,000원 (가성비)
+  또는 `.com` 1.5만원 (본격)
+- [ ] Vercel → Settings → Domains에 도메인 등록
+- [ ] 네임서버 변경 (Porkbun → Vercel 4개)
+- [ ] 환경변수 `NEXT_PUBLIC_SITE_URL` 갱신 + 재배포
+
+### D. AdSense 신청 (도메인 + 일일 방문자 30~50 안정 후)
+
+- [ ] AdSense 가입
+- [ ] 사이트 추가 → 본인 도메인
+- [ ] 검증 코드 `<head>` 삽입
+- [ ] 승인 대기 (1~14일, 거절되어도 보완 후 재신청)
+- [ ] 승인되면 `src/components/AdSlot.tsx`에 광고 단위 코드 삽입
+
+> Vercel Hobby 플랜은 약관상 비상업적이므로, 트래픽 폭발 시 Cloudflare Pages로 마이그레이션 가능 (영구 무료 + 상업 OK)
+
+### E. 콘텐츠 확장 (월 1~2개 추가, 우선순위)
+
+- [ ] **자동차세 계산기** (`/car-tax`) — 6/12월 시즌
+- [ ] **취득세 계산기** (`/acquisition-tax`) — 부동산 거래
+- [ ] **양도소득세 계산기** (`/capital-gains-tax`) — 부동산·주식
+- [ ] **종합소득세 계산기** (`/comprehensive-tax`) — 5월 시즌
+- [ ] **대출 이자 계산기** (`/loan-interest`) — 원리금균등/원금균등 비교
+
+기존 패턴 복사 → 식만 바꾸면 1개당 30분~2시간. CalculatorNav에 카드 추가만 하면 자동 연결.
 
 ---
 
 ## 계산 정확도
 
-본 계산기는 다음을 정확하게 반영합니다:
-- 4대보험료율 (2025~2026 시행 기준)
-- 근로소득공제 (소득세법 제47조)
-- 인적공제 (1인당 150만원)
-- 누진세율 (소득세법 제55조)
-- 근로소득세액공제 한도의 점진적 감소 (제59조)
-- 자녀세액공제 (8~20세 기준)
-- 식대 비과세 한도 (월 20만원)
-- 국민연금 기준소득월액 상·하한
+각 계산기는 해당 법령·제도를 정확하게 반영하도록 설계됐고 단위 테스트로 검증합니다.
 
-다음은 단순화·생략됨 (한국의 다른 일반 연봉 계산기들도 동일):
-- 매월 간이세액표 정확한 적용 → 누진세율로 근사 (연 단위 정산 시 결과는 같음)
-- 신용카드·의료비·교육비·기부금 등 특별 세액공제
-- 보너스·연차수당·퇴직금 등 비정기 지급
+- **연봉 실수령액**: 4대보험료율, 근로소득공제, 인적공제, 누진세율, 근로소득세액공제 (소득세법 제47·55·59조)
+- **퇴직금**: 평균임금 산식 + 상여·연차수당 3/12 가산 (근로자퇴직급여보장법 제8조)
+- **연차/연차수당**: 1년 미만 월차, 1년 이상 15+가산일, 통상시급 209시간 환산 (근로기준법 제60조)
+- **시급 변환**: 209시간 표준, 2026 최저시급(10,320원) 미달 자동 검증
+- **연말정산**: 신용카드·의료비·교육비·기부금·연금저축 핵심 공제 + 결정세액 vs 기납부세액 (단순 모델, ±10% 오차)
+- **청약 가점**: 무주택 32 + 부양가족 35 + 통장 17 = 84점 (주택공급규칙)
 
-다른 사이트(잡코리아·사람인 등)와는 ±3% 이내 차이가 있을 수 있고, 17개 테스트로 합리적 범위를 검증합니다.
+**알려진 단순화** (다른 계산기들도 동일):
+- 매월 간이세액표 정확 적용 → 누진세율 근사 (연 단위 정산은 동일)
+- 연말정산: 월세 세액공제, 주택자금 차입금, 청약저축 등 누락
+- 보너스·일회성 인센티브 등 비정기 지급 미반영
 
 ---
 
-## 다음 스텝 — 사용자 작업 체크리스트
+## 현실적 수익 기대치 (비슷 규모 한국어 계산기 평균)
 
-> 코드 자체는 모두 동작합니다. 아래는 **수익화 + 검색 노출**까지 가는 데 사용자가 직접 해야 하는 작업입니다.
-
-### 1. 배포 (당일, 30분)
-
-- [ ] **Vercel 가입** (`vercel.com`, GitHub 로그인)
-- [ ] 이 프로젝트 GitHub 저장소 푸시 (priv/public 둘 다 OK)
-- [ ] Vercel에서 `Import Project` → 자동 감지되어 빌드됨
-- [ ] **Production URL 확인** (예: `salary-calc-xxx.vercel.app`)
-- [ ] 환경변수 `NEXT_PUBLIC_SITE_URL`에 위 URL 추가 후 재배포
-
-### 2. 도메인 (선택, +30분)
-
-- [ ] 가비아·후이즈에서 `.com` 도메인 구입 (연 1~2만 원). 이름 추천:
-  - `salary-real.kr` / `silsuryeong.kr` / `monthlypay.kr` 같이 검색 친화적
-- [ ] Vercel → Project Settings → Domains에 도메인 연결 (네임서버만 변경하면 자동)
-- [ ] 환경변수 `NEXT_PUBLIC_SITE_URL` 도메인으로 갱신
-
-### 3. Search Console 등록 (당일, 15분)
-
-- [ ] [Google Search Console](https://search.google.com/search-console) 접속
-- [ ] 속성 추가 → URL 접두어 → 사이트 URL 입력
-- [ ] HTML 태그 인증 → 받은 메타 태그를 `src/app/layout.tsx` `metadata.verification.google`에 추가
-- [ ] sitemap 제출: `your-domain.com/sitemap.xml`
-- [ ] **첫 색인까지 보통 3~7일** 소요
-
-### 4. Google Analytics (선택, 10분)
-
-- [ ] [GA4](https://analytics.google.com) 속성 생성, 측정 ID(`G-XXXXXXXX`) 받기
-- [ ] `src/app/layout.tsx`에 GA 스크립트 추가 (또는 `@next/third-parties` 사용)
-
-### 5. AdSense 신청 (사이트 트래픽 안정 후, 1주~1달)
-
-AdSense는 콘텐츠 충분 + 일일 방문자가 어느 정도 있어야 승인됩니다. 보통 **검색 색인 후 일일 방문 50~100명** 시점에 신청.
-
-- [ ] [AdSense](https://adsense.google.com) 가입
-- [ ] 사이트 추가 → 본인 도메인 입력
-- [ ] AdSense가 준 검증 코드를 `<head>`에 삽입 (현재 layout.tsx에 자리만 만들어둠)
-- [ ] 승인 대기 (보통 1~14일, 거절되어도 보완해서 재신청 가능)
-- [ ] 승인되면 광고 단위 생성 → `src/app/page.tsx`의 `id="ad-slot-middle"` 자리에 단위 코드 삽입
-
-**승인 잘 되는 조건**:
-- 페이지 30개 이상 (콘텐츠 분량) — 추가 계산기 확장으로 채우기
-- 개인정보처리방침·연락처 페이지 (이미 있음 ✓)
-- 일관된 한국어 콘텐츠 (있음 ✓)
-- 자체 도메인 (`.vercel.app`보다 자체 도메인 권장)
-
-### 6. 콘텐츠 확장 (장기, 월 1~2개)
-
-검색 트래픽 = 페이지 수. 한 도메인에 계산기를 누적하면 키워드도 누적:
-
-- [ ] **퇴직금 계산기** (`/retirement`) — `퇴직금 계산` 월 30만 검색
-- [ ] **연차/연차수당 계산기** (`/annual-leave`) — `연차수당 계산` 월 10만 검색
-- [ ] **시급/주급/월급 변환기** (`/hourly`) — `최저시급` 키워드
-- [ ] **연말정산 환급액 추정기** (`/year-end-tax`) — 12~2월 시즌성 폭발 (월 100만+ 검색)
-- [ ] **청약 가점 계산기** (`/apt-score`) — 부동산 키워드 (CPC 매우 높음)
-- [ ] **양도소득세 계산기** (`/transfer-tax`) — 부동산 + 세금 (CPC 가장 높음)
-- [ ] **종합소득세 계산기** (`/comprehensive-tax`) — 5월 시즌 폭발
-
-각 계산기 추가 = 새 키워드 잡기 + AdSense 페이지 수 증가 + 사이트 권위 누적.
-
-### 7. SEO 키워드 작업 (지속)
-
-- [ ] 페이지마다 `<h1>` 키워드 1개 명확히 ("연봉 실수령액 계산기 2026")
-- [ ] FAQ를 검색어 의도에 맞게 추가 ("연봉 4000 실수령")
-- [ ] 블로그 코너 추가 (`/guide/연봉-실수령액-보는법`) — 정보형 키워드 유입
-- [ ] 외부 링크 (네이버 블로그·티스토리 등에 직접 글 쓰면서 사이트 링크) — 백링크 누적
-
-### 8. 모니터링 (월 1회)
-
-- [ ] Search Console: 어떤 키워드로 들어오는지, CTR
-- [ ] GA: 일일 방문자, 체류 시간, 이탈률
-- [ ] AdSense: RPM(천 노출당 수익), CPC, 채워지지 않는 슬롯
-
----
-
-## 현실적 수익 기대치
-
-비슷한 규모의 한국어 계산기 사이트들 평균:
-- **3개월 후**: 일 방문 50~100명, AdSense 미승인 또는 월 1~3만 원
-- **6개월 후**: 일 방문 200~500명, 월 5~30만 원
-- **12개월 후**: 일 방문 500~2,000명, 월 30~100만 원
-- **24개월 후 (콘텐츠 30+ 누적)**: 월 100~500만 원도 가능
+- **3개월 후**: 일 방문 50~100, AdSense 미승인 또는 월 1~3만 원
+- **6개월 후**: 일 방문 200~500, 월 5~30만 원
+- **12개월 후**: 일 방문 500~2,000, 월 30~100만 원
+- **24개월 후 (콘텐츠 30+)**: 월 100~500만 원도 가능
 
 폭발적이지 않지만 한 번 만들면 거의 손 안 가고, 계산기 1개 추가할 때마다 수익이 누적되는 구조입니다.
+
+---
+
+## 자주 쓰는 명령
+
+```bash
+cd "C:/Users/동환리/Desktop/SalaryCalc"
+
+npm run dev              # 로컬 (http://localhost:3000)
+npm test                 # 80개 테스트
+npm run build            # 빌드 검증
+
+# Vercel 자동 배포는 main push로
+git add . && git commit -m "..." && git push
+```
 
 ---
 
