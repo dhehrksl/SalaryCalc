@@ -31,13 +31,19 @@ const CALCULATORS = [
     desc: "공제 항목 입력으로 환급액 추정",
     icon: "🧾",
   },
+  {
+    href: "/apt-score",
+    title: "청약 가점",
+    desc: "무주택·부양·통장 84점 만점 산정",
+    icon: "🏠",
+  },
 ] as const;
 
 export default function CalculatorNav({ currentHref }: { currentHref: string }) {
   return (
     <nav aria-label="다른 계산기" className="my-8">
       <h3 className="mb-3 text-sm font-semibold text-slate-700">다른 계산기 둘러보기</h3>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         {CALCULATORS.map((c) => {
           const isCurrent = c.href === currentHref;
           if (isCurrent) {

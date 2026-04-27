@@ -84,6 +84,8 @@ export default function HomePage() {
             <span className="mx-2">·</span>
             <a href="/year-end-tax" className="hover:text-brand">연말정산 계산기</a>
             <span className="mx-2">·</span>
+            <a href="/apt-score" className="hover:text-brand">청약 가점 계산기</a>
+            <span className="mx-2">·</span>
             <a href="/privacy" className="hover:text-brand">개인정보처리방침</a>
             <span className="mx-2">·</span>
             <span>© {new Date().getFullYear()} Salary Calc</span>

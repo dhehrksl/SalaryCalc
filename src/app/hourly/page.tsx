@@ -118,6 +118,10 @@ export default function HourlyPage() {
               연말정산 계산기
             </Link>
             <span className="mx-2">·</span>
+            <Link href="/apt-score" className="hover:text-brand">
+              청약 가점 계산기
+            </Link>
+            <span className="mx-2">·</span>
             <Link href="/privacy" className="hover:text-brand">
               개인정보처리방침
             </Link>
