@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import AdSlot, { SideAdSlot } from "@/components/AdSlot";
+import CalculatorNav from "@/components/CalculatorNav";
 import RetirementCalculator from "@/components/RetirementCalculator";
 
 export const metadata: Metadata = {
@@ -56,6 +57,8 @@ export default function RetirementPage() {
 
           <AdSlot id="ad-retirement-after-calc" variant="rectangle" />
 
+          <CalculatorNav currentHref="/retirement" />
+
           <section className="mb-10">
             <h2 className="mb-4 text-xl font-bold text-slate-900">자주 묻는 질문</h2>
             <div className="space-y-2">
@@ -101,6 +104,10 @@ export default function RetirementPage() {
             <span className="mx-2">·</span>
             <Link href="/annual-leave" className="hover:text-brand">
               연차/연차수당 계산기
+            </Link>
+            <span className="mx-2">·</span>
+            <Link href="/hourly" className="hover:text-brand">
+              시급/주급/월급 계산기
             </Link>
             <span className="mx-2">·</span>
             <Link href="/privacy" className="hover:text-brand">

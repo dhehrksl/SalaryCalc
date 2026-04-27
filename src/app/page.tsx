@@ -1,5 +1,6 @@
 import AdSlot, { SideAdSlot } from "@/components/AdSlot";
 import Calculator from "@/components/Calculator";
+import CalculatorNav from "@/components/CalculatorNav";
 import Faq from "@/components/Faq";
 import HowItWorks from "@/components/HowItWorks";
 import RatesTable from "@/components/RatesTable";
@@ -44,6 +45,9 @@ export default function HomePage() {
           {/* 중간 광고 (계산기 직후 — 가장 노출 많은 자리) */}
           <AdSlot id="ad-after-calc" variant="rectangle" />
 
+          {/* 다른 계산기 네비 */}
+          <CalculatorNav currentHref="/" />
+
           {/* 작동 방식 */}
           <HowItWorks />
 
@@ -75,6 +79,8 @@ export default function HomePage() {
             <a href="/retirement" className="hover:text-brand">퇴직금 계산기</a>
             <span className="mx-2">·</span>
             <a href="/annual-leave" className="hover:text-brand">연차/연차수당 계산기</a>
+            <span className="mx-2">·</span>
+            <a href="/hourly" className="hover:text-brand">시급/주급/월급 계산기</a>
             <span className="mx-2">·</span>
             <a href="/privacy" className="hover:text-brand">개인정보처리방침</a>
             <span className="mx-2">·</span>

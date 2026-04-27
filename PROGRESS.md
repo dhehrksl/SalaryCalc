@@ -22,16 +22,15 @@
 - [x] 2026년 4대보험·근로소득세 계산 로직 (`src/lib/salary.ts`)
   - 국민연금 4.5% (상한 617만원), 건강보험 3.545%, 장기요양 12.95%, 고용보험 0.9%
   - 근로소득공제·인적공제·누진세율·근로소득세액공제(점진 감소)·자녀세액공제·식대 비과세
-- [x] vitest 38개 단위 테스트 모두 통과 (`npm test`) — salary 17 + retirement 8 + annual-leave 13
+- [x] vitest 50개 단위 테스트 모두 통과 (`npm test`) — salary 17 + retirement 8 + annual-leave 13 + hourly 12
 - [x] **퇴직금 계산기 페이지** (`/retirement`) — 평균임금·재직일수 기반 법정 퇴직금 산정
-  - `src/lib/retirement.ts` — 평균임금 + 상여·연차수당 가산분 + 1년 미만 미지급 처리
-  - `src/components/RetirementCalculator.tsx` — 입사/퇴사일·임금·상여·연차수당 입력 UI
-  - 메인 페이지 footer에 링크 추가, sitemap 등록
-- [x] **연차/연차수당 계산기 페이지** (`/annual-leave`) — 근로기준법 제60조 기준
-  - `src/lib/annualLeave.ts` — 1년 미만 월차/1년 이상 15일+가산/21년차 25일 상한/8할 미만 처리
-  - `src/components/AnnualLeaveCalculator.tsx` — 입사일·통상임금·사용일수·출근율 토글
-  - 통상시급 = 월급 / 209시간, 미사용 수당 자동 산출
-  - 메인·퇴직금 페이지 footer에 상호 링크
+- [x] **연차/연차수당 계산기 페이지** (`/annual-leave`) — 근로기준법 제60조 기준 발생 일수 + 통상임금 209시간 환산
+- [x] **시급/주급/월급 계산기 페이지** (`/hourly`) — 5단위 양방향 변환 (시급↔일급↔주급↔월급↔연봉)
+  - `src/lib/hourly.ts` — 209시간 표준 환산 + 2026 최저시급(10,320원) 미달 자동 검증
+  - `src/components/HourlyCalculator.tsx` — 단위 토글 + 프리셋(최저시급/월250~400/연5천~7천)
+- [x] **CalculatorNav 공통 컴포넌트** (`src/components/CalculatorNav.tsx`)
+  - 4개 계산기 카드 그리드, 현재 페이지는 강조 표시
+  - 모든 계산기 페이지의 광고 슬롯 직후에 삽입 — 페이지 간 이동 동선 확보
 - [x] 메인 페이지 UI — `src/components/Calculator.tsx` (실시간 계산, 모드 토글, 프리셋)
 - [x] 보조 컴포넌트: `HowItWorks`, `RatesTable`, `Faq`, `StructuredData`
 - [x] `/privacy` 페이지 (AdSense 필수)
@@ -64,6 +63,7 @@
 - [ ] **`/privacy` 색인 요청** (1분) — Search Console → URL 검사 → `https://salary-calc-coral.vercel.app/privacy` 입력 → 색인 생성 요청
 - [ ] **`/retirement` 색인 요청** (1분) — Search Console에서 URL 검사 → 색인 생성 요청
 - [ ] **`/annual-leave` 색인 요청** (1분) — Search Console에서 URL 검사 → 색인 생성 요청
+- [ ] **`/hourly` 색인 요청** (1분) — Search Console에서 URL 검사 → 색인 생성 요청
 - [x] ~~Vercel Analytics 켜기~~ — `@vercel/analytics` v2/`@vercel/analytics/next` 이미 통합됨. Vercel이 자동 PR을 만들려고 시도하다 충돌 발생, 우리는 직접 통합했으니 자동 PR 닫고 무시. 사이트 트래픽 발생 시 `_vercel/insights/view` 요청이 200으로 가면 정상 작동
 
 ---
@@ -91,11 +91,11 @@
 콘텐츠 1개 추가 = 새 검색 키워드 1개 잡기. 우선순위:
 1. ~~**퇴직금 계산기** (`/retirement`)~~ ✅ 완료 (2026-04-28)
 2. ~~**연차/연차수당 계산기** (`/annual-leave`)~~ ✅ 완료 (2026-04-28)
-3. **시급/주급/월급 변환기** (`/hourly`) — **다음 추천**
-4. **연말정산 환급액 추정기** (`/year-end-tax`) — 12~2월 시즌 폭발
+3. ~~**시급/주급/월급 변환기** (`/hourly`)~~ ✅ 완료 (2026-04-28)
+4. **연말정산 환급액 추정기** (`/year-end-tax`) — 12~2월 시즌 폭발 — **다음 추천**
 5. **청약 가점 계산기** (`/apt-score`) — 부동산 키워드 (CPC 매우 높음)
 
-기존 패턴 복사 → 식만 바꾸면 1개당 30분~2시간.
+기존 패턴 복사 → 식만 바꾸면 1개당 30분~2시간. 4페이지 모두 CalculatorNav로 자동 연결됨.
 
 ---
 
@@ -138,29 +138,34 @@ SalaryCalc/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx              # 메타데이터 + Search Console verification + Vercel Analytics
-│   │   ├── page.tsx                # 메인 (광고 슬롯 7개 위치)
+│   │   ├── page.tsx                # 메인 — 연봉 실수령
 │   │   ├── privacy/page.tsx
-│   │   ├── retirement/page.tsx     # 퇴직금 계산기 페이지
-│   │   ├── annual-leave/page.tsx   # 연차/연차수당 계산기 페이지
+│   │   ├── retirement/page.tsx     # 퇴직금 계산기
+│   │   ├── annual-leave/page.tsx   # 연차/연차수당 계산기
+│   │   ├── hourly/page.tsx         # 시급/주급/월급 변환기
 │   │   ├── sitemap.ts
 │   │   ├── robots.ts
 │   │   └── globals.css
 │   ├── components/
-│   │   ├── Calculator.tsx              # 연봉 실수령액 입력/결과
-│   │   ├── RetirementCalculator.tsx    # 퇴직금 계산 UI
-│   │   ├── AnnualLeaveCalculator.tsx   # 연차/연차수당 UI
+│   │   ├── Calculator.tsx              # 연봉 실수령액
+│   │   ├── RetirementCalculator.tsx    # 퇴직금
+│   │   ├── AnnualLeaveCalculator.tsx   # 연차/연차수당
+│   │   ├── HourlyCalculator.tsx        # 시급 변환
+│   │   ├── CalculatorNav.tsx           # 4개 계산기 카드 네비 (모든 페이지 공통)
 │   │   ├── AdSlot.tsx                  # 광고 placeholder + SideAdSlot
 │   │   ├── HowItWorks.tsx
 │   │   ├── RatesTable.tsx
 │   │   ├── Faq.tsx
 │   │   └── StructuredData.tsx
 │   └── lib/
-│       ├── salary.ts            # 연봉 실수령액 계산
-│       ├── salary.test.ts       # 17개 테스트
-│       ├── retirement.ts        # 퇴직금 계산
-│       ├── retirement.test.ts   # 8개 테스트
-│       ├── annualLeave.ts       # 연차/연차수당 계산
-│       ├── annualLeave.test.ts  # 13개 테스트
+│       ├── salary.ts            # 연봉 실수령액
+│       ├── salary.test.ts       # 17개
+│       ├── retirement.ts        # 퇴직금
+│       ├── retirement.test.ts   # 8개
+│       ├── annualLeave.ts       # 연차
+│       ├── annualLeave.test.ts  # 13개
+│       ├── hourly.ts            # 시급/주급/월급 환산
+│       ├── hourly.test.ts       # 12개
 │       └── site.ts              # SITE_URL fallback
 ├── README.md
 ├── NEXT_STEPS.md                # 깨어나서 할 일 체크리스트 (구버전)
@@ -200,9 +205,10 @@ git add . && git commit -m "..." && git push
 
 ### 2026-04-28 추가 작업
 - Vercel Web Analytics 통합 (`@vercel/analytics` v2 + `/next` 진입점, layout에 마운트)
-  - Vercel 자동 PR(`vercel/install-vercel-web-analytics-i-s7kxtg`)은 우리 직접 통합으로 충돌 → 닫음
-- 퇴직금 계산기 페이지 (`/retirement`) — 평균임금 + 상여·연차수당 가산 + 1년 미만 미지급 처리
-- 연차/연차수당 계산기 페이지 (`/annual-leave`) — 근로기준법 60조 기준 발생 일수 + 통상임금 209시간 환산 수당
-- sitemap에 두 페이지 등록, 메인·퇴직금 페이지 footer에 상호 링크
-- vitest 38개 테스트 모두 통과 (salary 17 + retirement 8 + annual-leave 13)
-- 빌드 통과 (Static prerender, /retirement 3.83 kB, /annual-leave 3.92 kB)
+- 퇴직금 계산기 페이지 (`/retirement`)
+- 연차/연차수당 계산기 페이지 (`/annual-leave`)
+- 시급/주급/월급 변환기 페이지 (`/hourly`) — 209시간 표준, 2026 최저시급 미달 자동 검증
+- **CalculatorNav 공통 컴포넌트** — 4개 계산기 카드 네비, 모든 페이지에서 상호 이동 가능
+- sitemap 4개 페이지 모두 등록, footer 링크도 일관 정비
+- vitest 50개 테스트 모두 통과 (salary 17 + retirement 8 + annual-leave 13 + hourly 12)
+- 빌드 통과 (Static prerender, 4페이지 모두 약 3~4 kB)

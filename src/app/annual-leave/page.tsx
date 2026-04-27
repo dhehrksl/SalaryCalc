@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import AdSlot, { SideAdSlot } from "@/components/AdSlot";
 import AnnualLeaveCalculator from "@/components/AnnualLeaveCalculator";
+import CalculatorNav from "@/components/CalculatorNav";
 
 export const metadata: Metadata = {
   title: "연차 계산기·연차수당 계산기 — 발생 일수와 미사용 수당 1초",
@@ -56,6 +57,8 @@ export default function AnnualLeavePage() {
 
           <AdSlot id="ad-leave-after-calc" variant="rectangle" />
 
+          <CalculatorNav currentHref="/annual-leave" />
+
           <section className="mb-10">
             <h2 className="mb-4 text-xl font-bold text-slate-900">자주 묻는 질문</h2>
             <div className="space-y-2">
@@ -105,6 +108,10 @@ export default function AnnualLeavePage() {
             <span className="mx-2">·</span>
             <Link href="/retirement" className="hover:text-brand">
               퇴직금 계산기
+            </Link>
+            <span className="mx-2">·</span>
+            <Link href="/hourly" className="hover:text-brand">
+              시급/주급/월급 계산기
             </Link>
             <span className="mx-2">·</span>
             <Link href="/privacy" className="hover:text-brand">
