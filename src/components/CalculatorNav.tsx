@@ -25,13 +25,19 @@ const CALCULATORS = [
     desc: "시급↔월급↔연봉 양방향 변환",
     icon: "⏱",
   },
+  {
+    href: "/year-end-tax",
+    title: "연말정산 환급",
+    desc: "공제 항목 입력으로 환급액 추정",
+    icon: "🧾",
+  },
 ] as const;
 
 export default function CalculatorNav({ currentHref }: { currentHref: string }) {
   return (
     <nav aria-label="다른 계산기" className="my-8">
       <h3 className="mb-3 text-sm font-semibold text-slate-700">다른 계산기 둘러보기</h3>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
         {CALCULATORS.map((c) => {
           const isCurrent = c.href === currentHref;
           if (isCurrent) {

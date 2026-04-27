@@ -22,14 +22,14 @@
 - [x] 2026년 4대보험·근로소득세 계산 로직 (`src/lib/salary.ts`)
   - 국민연금 4.5% (상한 617만원), 건강보험 3.545%, 장기요양 12.95%, 고용보험 0.9%
   - 근로소득공제·인적공제·누진세율·근로소득세액공제(점진 감소)·자녀세액공제·식대 비과세
-- [x] vitest 50개 단위 테스트 모두 통과 (`npm test`) — salary 17 + retirement 8 + annual-leave 13 + hourly 12
-- [x] **퇴직금 계산기 페이지** (`/retirement`) — 평균임금·재직일수 기반 법정 퇴직금 산정
-- [x] **연차/연차수당 계산기 페이지** (`/annual-leave`) — 근로기준법 제60조 기준 발생 일수 + 통상임금 209시간 환산
-- [x] **시급/주급/월급 계산기 페이지** (`/hourly`) — 5단위 양방향 변환 (시급↔일급↔주급↔월급↔연봉)
-  - `src/lib/hourly.ts` — 209시간 표준 환산 + 2026 최저시급(10,320원) 미달 자동 검증
-  - `src/components/HourlyCalculator.tsx` — 단위 토글 + 프리셋(최저시급/월250~400/연5천~7천)
-- [x] **CalculatorNav 공통 컴포넌트** (`src/components/CalculatorNav.tsx`)
-  - 4개 계산기 카드 그리드, 현재 페이지는 강조 표시
+- [x] vitest 60개 단위 테스트 모두 통과 (`npm test`) — salary 17 + retirement 8 + annual-leave 13 + hourly 12 + yearEndTax 10
+- [x] **퇴직금 계산기 페이지** (`/retirement`)
+- [x] **연차/연차수당 계산기 페이지** (`/annual-leave`)
+- [x] **시급/주급/월급 계산기 페이지** (`/hourly`)
+- [x] **연말정산 계산기 페이지** (`/year-end-tax`)
+  - `src/lib/yearEndTax.ts` — 신용카드/의료비/교육비/기부금/연금저축 등 핵심 공제 + 결정세액 vs 기납부세액 = 환급/추납 추정
+  - `src/components/YearEndTaxCalculator.tsx` — 3개 입력 그룹 (기본/카드/세액공제), 환급/추납 색상 구분 결과 카드
+- [x] **CalculatorNav 공통 컴포넌트** — **5개 계산기 카드** 그리드 (반응형 2/3/5 컬럼)
   - 모든 계산기 페이지의 광고 슬롯 직후에 삽입 — 페이지 간 이동 동선 확보
 - [x] 메인 페이지 UI — `src/components/Calculator.tsx` (실시간 계산, 모드 토글, 프리셋)
 - [x] 보조 컴포넌트: `HowItWorks`, `RatesTable`, `Faq`, `StructuredData`
@@ -64,6 +64,7 @@
 - [ ] **`/retirement` 색인 요청** (1분) — Search Console에서 URL 검사 → 색인 생성 요청
 - [ ] **`/annual-leave` 색인 요청** (1분) — Search Console에서 URL 검사 → 색인 생성 요청
 - [ ] **`/hourly` 색인 요청** (1분) — Search Console에서 URL 검사 → 색인 생성 요청
+- [ ] **`/year-end-tax` 색인 요청** (1분) — Search Console에서 URL 검사 → 색인 생성 요청. **12~2월 시즌에는 이 키워드가 가장 많이 검색됨**
 - [x] ~~Vercel Analytics 켜기~~ — `@vercel/analytics` v2/`@vercel/analytics/next` 이미 통합됨. Vercel이 자동 PR을 만들려고 시도하다 충돌 발생, 우리는 직접 통합했으니 자동 PR 닫고 무시. 사이트 트래픽 발생 시 `_vercel/insights/view` 요청이 200으로 가면 정상 작동
 
 ---
@@ -92,10 +93,12 @@
 1. ~~**퇴직금 계산기** (`/retirement`)~~ ✅ 완료 (2026-04-28)
 2. ~~**연차/연차수당 계산기** (`/annual-leave`)~~ ✅ 완료 (2026-04-28)
 3. ~~**시급/주급/월급 변환기** (`/hourly`)~~ ✅ 완료 (2026-04-28)
-4. **연말정산 환급액 추정기** (`/year-end-tax`) — 12~2월 시즌 폭발 — **다음 추천**
-5. **청약 가점 계산기** (`/apt-score`) — 부동산 키워드 (CPC 매우 높음)
+4. ~~**연말정산 환급액 추정기** (`/year-end-tax`)~~ ✅ 완료 (2026-04-28)
+5. **청약 가점 계산기** (`/apt-score`) — 부동산 키워드 (CPC 매우 높음) — **다음 추천**
+6. **자동차세 계산기** (`/car-tax`) — 배기량 × 영수증세율, 6월·12월 시즌
+7. **취득세/부동산세 계산기** (`/property-tax`)
 
-기존 패턴 복사 → 식만 바꾸면 1개당 30분~2시간. 4페이지 모두 CalculatorNav로 자동 연결됨.
+기존 패턴 복사 → 식만 바꾸면 1개당 30분~2시간. CalculatorNav에 카드 추가만 하면 5페이지 자동 연결.
 
 ---
 
@@ -140,9 +143,10 @@ SalaryCalc/
 │   │   ├── layout.tsx              # 메타데이터 + Search Console verification + Vercel Analytics
 │   │   ├── page.tsx                # 메인 — 연봉 실수령
 │   │   ├── privacy/page.tsx
-│   │   ├── retirement/page.tsx     # 퇴직금 계산기
-│   │   ├── annual-leave/page.tsx   # 연차/연차수당 계산기
-│   │   ├── hourly/page.tsx         # 시급/주급/월급 변환기
+│   │   ├── retirement/page.tsx     # 퇴직금
+│   │   ├── annual-leave/page.tsx   # 연차/연차수당
+│   │   ├── hourly/page.tsx         # 시급/주급/월급 변환
+│   │   ├── year-end-tax/page.tsx   # 연말정산 환급
 │   │   ├── sitemap.ts
 │   │   ├── robots.ts
 │   │   └── globals.css
@@ -151,8 +155,9 @@ SalaryCalc/
 │   │   ├── RetirementCalculator.tsx    # 퇴직금
 │   │   ├── AnnualLeaveCalculator.tsx   # 연차/연차수당
 │   │   ├── HourlyCalculator.tsx        # 시급 변환
-│   │   ├── CalculatorNav.tsx           # 4개 계산기 카드 네비 (모든 페이지 공통)
-│   │   ├── AdSlot.tsx                  # 광고 placeholder + SideAdSlot
+│   │   ├── YearEndTaxCalculator.tsx    # 연말정산
+│   │   ├── CalculatorNav.tsx           # 5개 계산기 카드 네비 (모든 페이지 공통)
+│   │   ├── AdSlot.tsx
 │   │   ├── HowItWorks.tsx
 │   │   ├── RatesTable.tsx
 │   │   ├── Faq.tsx
@@ -164,8 +169,10 @@ SalaryCalc/
 │       ├── retirement.test.ts   # 8개
 │       ├── annualLeave.ts       # 연차
 │       ├── annualLeave.test.ts  # 13개
-│       ├── hourly.ts            # 시급/주급/월급 환산
+│       ├── hourly.ts            # 시급 환산
 │       ├── hourly.test.ts       # 12개
+│       ├── yearEndTax.ts        # 연말정산
+│       ├── yearEndTax.test.ts   # 10개
 │       └── site.ts              # SITE_URL fallback
 ├── README.md
 ├── NEXT_STEPS.md                # 깨어나서 할 일 체크리스트 (구버전)
@@ -204,11 +211,9 @@ git add . && git commit -m "..." && git push
 마지막 진행 시점 — 2026-04-28. 작업 컨텍스트는 이 파일에 그대로 남아 있음.
 
 ### 2026-04-28 추가 작업
-- Vercel Web Analytics 통합 (`@vercel/analytics` v2 + `/next` 진입점, layout에 마운트)
-- 퇴직금 계산기 페이지 (`/retirement`)
-- 연차/연차수당 계산기 페이지 (`/annual-leave`)
-- 시급/주급/월급 변환기 페이지 (`/hourly`) — 209시간 표준, 2026 최저시급 미달 자동 검증
-- **CalculatorNav 공통 컴포넌트** — 4개 계산기 카드 네비, 모든 페이지에서 상호 이동 가능
-- sitemap 4개 페이지 모두 등록, footer 링크도 일관 정비
-- vitest 50개 테스트 모두 통과 (salary 17 + retirement 8 + annual-leave 13 + hourly 12)
-- 빌드 통과 (Static prerender, 4페이지 모두 약 3~4 kB)
+- Vercel Web Analytics 통합 (`@vercel/analytics` v2 + `/next` 진입점)
+- 퇴직금 (`/retirement`), 연차/연차수당 (`/annual-leave`), 시급/주급/월급 (`/hourly`), 연말정산 (`/year-end-tax`) 4개 신규 페이지
+- **CalculatorNav 공통 컴포넌트** — 5개 계산기 카드 네비, 모든 페이지 상호 연결
+- sitemap 5개 페이지 등록, 모든 footer 링크 일관 정비
+- vitest 60개 테스트 모두 통과 (salary 17 + retirement 8 + annual-leave 13 + hourly 12 + yearEndTax 10)
+- 빌드 통과 (Static prerender, 5페이지 모두 3~4 kB)
