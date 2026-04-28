@@ -56,9 +56,9 @@ export default function AptScorePage() {
 
           <AptScoreCalculator />
 
-          <AdSlot id="ad-apt-after-calc" variant="rectangle" />
-
           <CalculatorNav currentHref="/apt-score" />
+
+          <AdSlot id="ad-apt-after-calc" variant="rectangle" />
 
           <section className="mb-10">
             <h2 className="mb-4 text-xl font-bold text-slate-900">자주 묻는 질문</h2>

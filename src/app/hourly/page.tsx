@@ -55,9 +55,9 @@ export default function HourlyPage() {
 
           <HourlyCalculator />
 
-          <AdSlot id="ad-hourly-after-calc" variant="rectangle" />
-
           <CalculatorNav currentHref="/hourly" />
+
+          <AdSlot id="ad-hourly-after-calc" variant="rectangle" />
 
           <section className="mb-10">
             <h2 className="mb-4 text-xl font-bold text-slate-900">자주 묻는 질문</h2>

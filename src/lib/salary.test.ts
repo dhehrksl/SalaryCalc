@@ -98,3 +98,33 @@ describe("MEAL_NONTAX_MONTHLY_CAP", () => {
     expect(MEAL_NONTAX_MONTHLY_CAP).toBe(200_000);
   });
 });
+
+describe("calculateSalary — 사업주 부담분", () => {
+  it("연봉 0이면 사업주 부담도 0", () => {
+    const r = calculateSalary({ ...baseInput });
+    expect(r.employerInsurance.total).toBe(0);
+  });
+
+  it("국민연금·건강·장기요양·고용 실업분은 근로자 부담과 동일", () => {
+    const r = calculateSalary({ ...baseInput, annualSalary: 50_000_000 });
+    expect(r.employerInsurance.nationalPension).toBe(r.insurance.nationalPension);
+    expect(r.employerInsurance.healthInsurance).toBe(r.insurance.healthInsurance);
+    expect(r.employerInsurance.longTermCare).toBe(r.insurance.longTermCare);
+    expect(r.employerInsurance.employmentInsurance).toBe(r.insurance.employmentInsurance);
+  });
+
+  it("사업주는 고용안정·직업능력개발 0.25% 추가", () => {
+    const r = calculateSalary({ ...baseInput, annualSalary: 50_000_000 });
+    // 비과세 0이면 monthlyTaxableGross == monthlyGross
+    const expected = Math.floor(r.monthlyTaxableGross * 0.0025);
+    expect(r.employerInsurance.employmentStability).toBe(expected);
+  });
+
+  it("사업주 부담 합계 > 근로자 부담 합계 (고용안정 가산분만큼)", () => {
+    const r = calculateSalary({ ...baseInput, annualSalary: 50_000_000 });
+    expect(r.employerInsurance.total).toBeGreaterThan(r.insurance.total);
+    expect(r.employerInsurance.total - r.insurance.total).toBe(
+      r.employerInsurance.employmentStability,
+    );
+  });
+});

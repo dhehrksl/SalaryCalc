@@ -21,6 +21,8 @@ export const RATES = {
   longTermCareOfHealth: 0.1295,
   // 고용보험 (근로자 부담, 150인 미만 사업장 기준)
   employmentInsurance: 0.009,
+  // 사업주 추가 부담: 고용안정·직업능력개발사업 (150인 미만)
+  employerEmploymentStability: 0.0025,
 } as const;
 
 // 종합소득세율 — 누진공제 방식
@@ -54,6 +56,18 @@ export interface InsuranceBreakdown {
   healthInsurance: number;
   longTermCare: number;
   employmentInsurance: number;
+  total: number;
+}
+
+/** 사업주(회사)가 부담하는 월 4대보험. 산재보험은 업종별이라 제외. */
+export interface EmployerInsuranceBreakdown {
+  nationalPension: number;
+  healthInsurance: number;
+  longTermCare: number;
+  /** 고용보험 실업급여분 (근로자분과 동일 0.9%) */
+  employmentInsurance: number;
+  /** 고용보험 고용안정·직업능력개발사업분 (사업주만, 150인 미만 0.25%) */
+  employmentStability: number;
   total: number;
 }
 
@@ -93,6 +107,8 @@ export interface CalcResult {
   monthlyTaxableGross: number;
   /** 4대보험 (월 단위) */
   insurance: InsuranceBreakdown;
+  /** 사업주 부담 4대보험 (월) — 산재 제외 */
+  employerInsurance: EmployerInsuranceBreakdown;
   /** 소득세 상세 */
   tax: TaxBreakdown;
 }
@@ -164,6 +180,42 @@ function calcInsurance(monthlyTaxable: number): InsuranceBreakdown {
   };
 }
 
+function calcEmployerInsurance(monthlyTaxable: number): EmployerInsuranceBreakdown {
+  if (monthlyTaxable <= 0) {
+    return {
+      nationalPension: 0,
+      healthInsurance: 0,
+      longTermCare: 0,
+      employmentInsurance: 0,
+      employmentStability: 0,
+      total: 0,
+    };
+  }
+  // 사업주 부담분도 동일 요율(국민연금·건강·장기요양·고용보험 실업급여분)
+  const pensionBase = Math.min(
+    Math.max(monthlyTaxable, RATES.pensionBaseLower),
+    RATES.pensionBaseUpper,
+  );
+  const nationalPension = Math.floor(pensionBase * RATES.nationalPension);
+  const healthInsurance = Math.floor(monthlyTaxable * RATES.healthInsurance);
+  const longTermCare = Math.floor(healthInsurance * RATES.longTermCareOfHealth);
+  const employmentInsurance = Math.floor(monthlyTaxable * RATES.employmentInsurance);
+  const employmentStability = Math.floor(monthlyTaxable * RATES.employerEmploymentStability);
+  return {
+    nationalPension,
+    healthInsurance,
+    longTermCare,
+    employmentInsurance,
+    employmentStability,
+    total:
+      nationalPension +
+      healthInsurance +
+      longTermCare +
+      employmentInsurance +
+      employmentStability,
+  };
+}
+
 export function calculateSalary(input: CalcInput): CalcResult {
   const annualSalary = Math.max(0, Math.floor(input.annualSalary || 0));
   const monthlyNonTaxable = Math.max(0, Math.floor(input.monthlyNonTaxable || 0));
@@ -182,6 +234,9 @@ export function calculateSalary(input: CalcInput): CalcResult {
   // 4대보험 (월 과세급여 기준)
   const monthlyInsurance = calcInsurance(monthlyTaxableGross);
   const annualInsurance = monthlyInsurance.total * 12;
+
+  // 사업주 부담분 (월 과세급여 기준, 산재 제외)
+  const monthlyEmployerInsurance = calcEmployerInsurance(monthlyTaxableGross);
 
   // 소득공제
   const earnedIncomeDeduction = Math.floor(calcEarnedIncomeDeduction(taxableAnnual));
@@ -223,6 +278,7 @@ export function calculateSalary(input: CalcInput): CalcResult {
     monthlyGross,
     monthlyTaxableGross,
     insurance: monthlyInsurance,
+    employerInsurance: monthlyEmployerInsurance,
     tax: {
       earnedIncomeDeduction,
       personalDeduction,

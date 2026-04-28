@@ -42,11 +42,11 @@ export default function HomePage() {
           {/* 계산기 */}
           <Calculator />
 
-          {/* 중간 광고 (계산기 직후 — 가장 노출 많은 자리) */}
-          <AdSlot id="ad-after-calc" variant="rectangle" />
-
           {/* 다른 계산기 네비 */}
           <CalculatorNav currentHref="/" />
+
+          {/* 중간 광고 (네비 직후) */}
+          <AdSlot id="ad-after-calc" variant="rectangle" />
 
           {/* 작동 방식 */}
           <HowItWorks />
