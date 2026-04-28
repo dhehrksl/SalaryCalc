@@ -42,7 +42,7 @@ export default function YearEndTaxPage() {
         <SideAdSlot id="ad-tax-side-left" side="left" />
 
         <main className="min-w-0 flex-1">
-          <section className="mb-8 text-center">
+          <section className="mb-6 text-center">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               연말정산 계산기 · 환급액 추정
             </h1>
@@ -52,11 +52,11 @@ export default function YearEndTaxPage() {
             </p>
           </section>
 
+          <CalculatorNav currentHref="/year-end-tax" />
+
           <AdSlot id="ad-tax-top" variant="horizontal" />
 
           <YearEndTaxCalculator />
-
-          <CalculatorNav currentHref="/year-end-tax" />
 
           <AdSlot id="ad-tax-after-calc" variant="rectangle" />
 

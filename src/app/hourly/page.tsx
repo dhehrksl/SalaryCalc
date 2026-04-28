@@ -42,7 +42,7 @@ export default function HourlyPage() {
         <SideAdSlot id="ad-hourly-side-left" side="left" />
 
         <main className="min-w-0 flex-1">
-          <section className="mb-8 text-center">
+          <section className="mb-6 text-center">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               시급 계산기 · 월급 계산기
             </h1>
@@ -51,11 +51,11 @@ export default function HourlyPage() {
             </p>
           </section>
 
+          <CalculatorNav currentHref="/hourly" />
+
           <AdSlot id="ad-hourly-top" variant="horizontal" />
 
           <HourlyCalculator />
-
-          <CalculatorNav currentHref="/hourly" />
 
           <AdSlot id="ad-hourly-after-calc" variant="rectangle" />
 

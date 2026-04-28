@@ -27,7 +27,7 @@ export default function HomePage() {
 
         <main className="min-w-0 flex-1">
           {/* 인트로 */}
-          <section className="mb-8 text-center">
+          <section className="mb-6 text-center">
             <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               세전 연봉으로 월 실수령액을 1초 만에
             </h2>
@@ -36,16 +36,16 @@ export default function HomePage() {
             </p>
           </section>
 
+          {/* 다른 계산기 네비 (상단 배치) */}
+          <CalculatorNav currentHref="/" />
+
           {/* 상단 광고 (계산기 위) */}
           <AdSlot id="ad-top" variant="horizontal" />
 
           {/* 계산기 */}
           <Calculator />
 
-          {/* 다른 계산기 네비 */}
-          <CalculatorNav currentHref="/" />
-
-          {/* 중간 광고 (네비 직후) */}
+          {/* 중간 광고 (계산기 직후) */}
           <AdSlot id="ad-after-calc" variant="rectangle" />
 
           {/* 작동 방식 */}

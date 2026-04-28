@@ -42,7 +42,7 @@ export default function AptScorePage() {
         <SideAdSlot id="ad-apt-side-left" side="left" />
 
         <main className="min-w-0 flex-1">
-          <section className="mb-8 text-center">
+          <section className="mb-6 text-center">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               청약 가점 계산기
             </h1>
@@ -52,11 +52,11 @@ export default function AptScorePage() {
             </p>
           </section>
 
+          <CalculatorNav currentHref="/apt-score" />
+
           <AdSlot id="ad-apt-top" variant="horizontal" />
 
           <AptScoreCalculator />
-
-          <CalculatorNav currentHref="/apt-score" />
 
           <AdSlot id="ad-apt-after-calc" variant="rectangle" />
 

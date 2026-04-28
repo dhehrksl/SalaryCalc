@@ -42,7 +42,7 @@ export default function AnnualLeavePage() {
         <SideAdSlot id="ad-leave-side-left" side="left" />
 
         <main className="min-w-0 flex-1">
-          <section className="mb-8 text-center">
+          <section className="mb-6 text-center">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               연차 계산기 · 연차수당 계산기
             </h1>
@@ -51,11 +51,11 @@ export default function AnnualLeavePage() {
             </p>
           </section>
 
+          <CalculatorNav currentHref="/annual-leave" />
+
           <AdSlot id="ad-leave-top" variant="horizontal" />
 
           <AnnualLeaveCalculator />
-
-          <CalculatorNav currentHref="/annual-leave" />
 
           <AdSlot id="ad-leave-after-calc" variant="rectangle" />
 

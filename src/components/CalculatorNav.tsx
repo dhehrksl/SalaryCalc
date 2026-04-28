@@ -1,75 +1,47 @@
 import Link from "next/link";
 
 const CALCULATORS = [
-  {
-    href: "/",
-    title: "연봉 실수령액",
-    desc: "4대보험·소득세 빼고 월/연 실수령",
-    icon: "💰",
-  },
-  {
-    href: "/retirement",
-    title: "퇴직금",
-    desc: "평균임금·재직기간으로 법정 퇴직금",
-    icon: "🏖",
-  },
-  {
-    href: "/annual-leave",
-    title: "연차/연차수당",
-    desc: "발생 일수와 미사용 수당",
-    icon: "📅",
-  },
-  {
-    href: "/hourly",
-    title: "시급/주급/월급",
-    desc: "시급↔월급↔연봉 양방향 변환",
-    icon: "⏱",
-  },
-  {
-    href: "/year-end-tax",
-    title: "연말정산 환급",
-    desc: "공제 항목 입력으로 환급액 추정",
-    icon: "🧾",
-  },
-  {
-    href: "/apt-score",
-    title: "청약 가점",
-    desc: "무주택·부양·통장 84점 만점 산정",
-    icon: "🏠",
-  },
+  { href: "/", title: "연봉 실수령액", icon: "💰" },
+  { href: "/retirement", title: "퇴직금", icon: "🏖" },
+  { href: "/annual-leave", title: "연차/연차수당", icon: "📅" },
+  { href: "/hourly", title: "시급/주급/월급", icon: "⏱" },
+  { href: "/year-end-tax", title: "연말정산 환급", icon: "🧾" },
+  { href: "/apt-score", title: "청약 가점", icon: "🏠" },
 ] as const;
 
 export default function CalculatorNav({ currentHref }: { currentHref: string }) {
   return (
-    <nav aria-label="다른 계산기" className="my-8">
-      <h3 className="mb-3 text-sm font-semibold text-slate-700">다른 계산기 둘러보기</h3>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+    <nav aria-label="다른 계산기" className="mb-6">
+      <div className="mb-2.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+        <span className="h-px flex-1 bg-slate-200" />
+        <span>다른 계산기 둘러보기</span>
+        <span className="h-px flex-1 bg-slate-200" />
+      </div>
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 [scrollbar-width:thin]">
         {CALCULATORS.map((c) => {
           const isCurrent = c.href === currentHref;
+          const base =
+            "flex flex-shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold transition";
           if (isCurrent) {
             return (
-              <div
+              <span
                 key={c.href}
                 aria-current="page"
-                className="rounded-xl border-2 border-brand bg-brand-light/40 p-4 text-left"
+                className={`${base} bg-brand text-white shadow-sm shadow-brand/20`}
               >
-                <div className="text-2xl">{c.icon}</div>
-                <div className="mt-2 text-sm font-bold text-brand">{c.title}</div>
-                <div className="mt-0.5 text-xs text-slate-600">현재 페이지</div>
-              </div>
+                <span aria-hidden>{c.icon}</span>
+                <span>{c.title}</span>
+              </span>
             );
           }
           return (
             <Link
               key={c.href}
               href={c.href}
-              className="group block rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-brand hover:shadow-md"
+              className={`${base} bg-white text-slate-600 ring-1 ring-slate-200 hover:-translate-y-0.5 hover:bg-brand-light/60 hover:text-brand hover:ring-brand/40`}
             >
-              <div className="text-2xl">{c.icon}</div>
-              <div className="mt-2 text-sm font-bold text-slate-800 group-hover:text-brand">
-                {c.title}
-              </div>
-              <div className="mt-0.5 text-xs text-slate-500">{c.desc}</div>
+              <span aria-hidden>{c.icon}</span>
+              <span>{c.title}</span>
             </Link>
           );
         })}

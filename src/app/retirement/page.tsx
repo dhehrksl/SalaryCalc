@@ -41,7 +41,7 @@ export default function RetirementPage() {
         <SideAdSlot id="ad-retirement-side-left" side="left" />
 
         <main className="min-w-0 flex-1">
-          <section className="mb-8 text-center">
+          <section className="mb-6 text-center">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               퇴직금 계산기
             </h1>
@@ -51,11 +51,11 @@ export default function RetirementPage() {
             </p>
           </section>
 
+          <CalculatorNav currentHref="/retirement" />
+
           <AdSlot id="ad-retirement-top" variant="horizontal" />
 
           <RetirementCalculator />
-
-          <CalculatorNav currentHref="/retirement" />
 
           <AdSlot id="ad-retirement-after-calc" variant="rectangle" />
 
